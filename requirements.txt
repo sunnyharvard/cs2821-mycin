@@ -1,0 +1,9 @@
+# Core dependencies
+pandas>=2.0
+numpy>=1.24
+
+# Optional: if you plan to use the LLM step via OpenAI or other APIs
+openai>=1.0.0   # or anthropic, cohere, etc. depending on what your partner uses
+
+# Optional but helpful utilities
+tqdm>=4.65      # progress bars (nice for large test sets)
