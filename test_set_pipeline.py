@@ -170,7 +170,10 @@ def print_preview_dicts(dicts: List[Dict[str, Any]], n: int = 10, title: str = "
 
 def run_llm_pipeline(patient_payloads: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    TODO: Implement actual LLM call.
+    Run MYCIN inference engine on patient payloads.
+    
+    Uses LLM only for answering questions, not for rule evaluation.
+    Rule evaluation is handled programmatically by the inference engine.
 
     Input: list of payloads, each like:
       {
@@ -180,13 +183,25 @@ def run_llm_pipeline(patient_payloads: List[Dict[str, Any]]) -> List[Dict[str, A
 
     Expected output (aligned to input order), each element like:
       {
-        "predicted_label": "Influenza",
-        "probs": {"Influenza": 0.72, "URTI": 0.20, ...}
+        "predicted_label": "streptococcus",
+        "probs": {"streptococcus": 0.72, "staphylococcus": 0.20, ...}
       }
-
-    For now, raise NotImplementedError so you either implement this or pass --predictions.
     """
-    raise NotImplementedError("run_llm_pipeline is a placeholder. Implement it or use --predictions JSONL.")
+    try:
+        from mycin_pipeline_integration import run_mycin_pipeline, example_llm_call
+    except ImportError:
+        raise NotImplementedError(
+            "MYCIN modules not found. Install dependencies or use --predictions JSONL."
+        )
+    
+    # Use MYCIN pipeline
+    # Replace example_llm_call with your actual LLM API call function
+    return run_mycin_pipeline(
+        patient_payloads,
+        llm_call_fn=example_llm_call,  # Replace with your LLM function
+        use_llm_for_extraction=True,
+        use_llm_for_questions=True
+    )
 
 
 # --------------------------
