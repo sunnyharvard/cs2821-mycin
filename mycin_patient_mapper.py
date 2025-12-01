@@ -4,10 +4,14 @@ MYCIN Patient Data Mapper
 
 Maps general patient evidence data to MYCIN-specific parameters.
 Uses LLM to extract MYCIN-relevant information from patient data.
+Now works with actual question text from question_en_output.txt
 """
 
 import json
 from typing import Dict, Any, Optional, Callable, List
+
+from mycin_question_mapping import get_parameter_from_question, ALL_AVAILABLE_QUESTIONS
+from mycin_rules import QUESTIONS
 
 
 def create_llm_extraction_prompt(patient_data: Dict[str, Any], target_parameters: List[str]) -> str:
@@ -145,6 +149,7 @@ def map_to_mycin_format(patient_payload: Dict[str, Any],
                        llm_extraction_fn: Optional[Callable] = None) -> Dict[str, Any]:
     """
     Map a patient payload from the pipeline to MYCIN format.
+    Now works with actual question text from question_en_output.txt.
     
     Args:
         patient_payload: Patient payload from test_set_pipeline.py
@@ -155,18 +160,25 @@ def map_to_mycin_format(patient_payload: Dict[str, Any],
     """
     mycin_params = {}
     
-    # First, check if evidence already contains MYCIN parameters directly
+    # Map evidence questions to MYCIN parameters
     evidence = patient_payload.get("evidence", {})
-    from mycin_rules import QUESTIONS
-    for param in QUESTIONS.keys():
-        if param in evidence:
-            # Direct MYCIN parameter found
-            mycin_params[param] = evidence[param]
     
-    # Extract additional MYCIN parameters from general evidence
+    # First pass: map actual question text to MYCIN parameters
+    for question_text, answer in evidence.items():
+        param = get_parameter_from_question(question_text)
+        if param:
+            # Found a mapping - use the answer
+            mycin_params[param] = answer
+        else:
+            # Check if it's already a MYCIN parameter name
+            from mycin_rules import QUESTIONS
+            if question_text in QUESTIONS:
+                mycin_params[question_text] = answer
+    
+    # Extract additional MYCIN parameters from general evidence using keyword matching
     extracted = extract_mycin_parameters(patient_payload, llm_extraction_fn)
     
-    # Merge (extracted values don't override direct parameters)
+    # Merge (extracted values don't override direct mappings)
     for key, value in extracted.items():
         if key not in mycin_params and value is not None:
             mycin_params[key] = value

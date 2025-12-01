@@ -55,54 +55,65 @@ class Rule:
 # QUESTIONS / PARAMETERS
 # ============================================================================
 
+# QUESTIONS dictionary maps MYCIN parameter names to question descriptions
+# Note: Actual patient data uses question text from question_en_output.txt
+# The mycin_question_mapping.py module handles mapping actual questions to these parameters
 QUESTIONS = {
-    # Patient Demographics
+    # Patient Demographics (from CSV demographics columns)
     "age": "What is the patient's age?",
     "sex": "What is the patient's sex?",
     "weight": "What is the patient's weight (kg)?",
     
-    # Infection Site
+    # Infection Site (may need LLM inference)
     "site": "What is the site of the infection?",
     "culture_site": "What is the site of the culture?",
     
-    # Organism Characteristics
-    "gram_stain": "What is the gram stain of the organism? (positive/negative)",
-    "morphology": "What is the morphology of the organism? (coccus/rod/spirillum)",
-    "growth_pattern": "How does the organism grow? (chains/pairs/clusters/single)",
-    "aerobicity": "Is the organism aerobic, anaerobic, or facultative?",
-    "spore_forming": "Is the organism spore-forming?",
+    # Organism Characteristics (typically require LLM inference from symptoms)
+    "gram_stain": "What is the gram stain of the organism? (positive/negative) - LLM inferred",
+    "morphology": "What is the morphology of the organism? (coccus/rod/spirillum) - LLM inferred",
+    "growth_pattern": "How does the organism grow? (chains/pairs/clusters/single) - LLM inferred",
+    "aerobicity": "Is the organism aerobic, anaerobic, or facultative? - LLM inferred",
+    "spore_forming": "Is the organism spore-forming? - LLM inferred",
     
-    # Clinical Context
-    "burn": "Does the patient have burns? (serious/moderate/none)",
-    "immunocompromised": "Is the patient immunocompromised?",
-    "recent_surgery": "Has the patient had recent surgery?",
-    "hospital_acquired": "Is this a hospital-acquired infection?",
-    "community_acquired": "Is this a community-acquired infection?",
-    "previous_antibiotics": "Has the patient received previous antibiotics?",
+    # Clinical Context (mapped from actual questions)
+    "burn": "Does the patient have burns? (serious/moderate/none) - LLM inferred",
+    "immunocompromised": "Is the patient immunocompromised? (mapped from immunosuppressed/HIV questions)",
+    "recent_surgery": "Has the patient had recent surgery? (mapped from 'Have you had surgery within the last month?')",
+    "hospital_acquired": "Is this a hospital-acquired infection? - LLM inferred",
+    "community_acquired": "Is this a community-acquired infection? - LLM inferred",
+    "previous_antibiotics": "Has the patient received previous antibiotics? - LLM inferred",
     
-    # Lab Results
-    "white_blood_count": "What is the white blood cell count?",
-    "fever": "Does the patient have fever? (temperature > 38°C)",
-    "cerebrospinal_fluid": "What are the CSF findings?",
-    "urine_culture": "What are the urine culture results?",
-    "sputum_culture": "What are the sputum culture results?",
-    "blood_culture": "What are the blood culture results?",
+    # Lab Results (typically require LLM inference)
+    "white_blood_count": "What is the white blood cell count? - LLM inferred",
+    "fever": "Does the patient have fever? (mapped from 'Do you have a fever (either felt or measured with a thermometer)?')",
+    "cerebrospinal_fluid": "What are the CSF findings? - LLM inferred",
+    "urine_culture": "What are the urine culture results? - LLM inferred",
+    "sputum_culture": "What are the sputum culture results? - LLM inferred",
+    "blood_culture": "What are the blood culture results? - LLM inferred",
     
-    # Symptoms
-    "cough": "Does the patient have a cough?",
-    "dyspnea": "Does the patient have dyspnea (shortness of breath)?",
-    "chest_pain": "Does the patient have chest pain?",
-    "headache": "Does the patient have a headache?",
-    "nuchal_rigidity": "Does the patient have nuchal rigidity?",
-    "urinary_symptoms": "Does the patient have urinary symptoms (dysuria, frequency)?",
-    "abdominal_pain": "Does the patient have abdominal pain?",
+    # Symptoms (mapped from actual questions)
+    "cough": "Does the patient have a cough? (mapped from 'Do you have a cough?')",
+    "dyspnea": "Does the patient have dyspnea? (mapped from shortness of breath questions)",
+    "chest_pain": "Does the patient have chest pain? (mapped from chest pain questions)",
+    "headache": "Does the patient have a headache? - LLM inferred",
+    "nuchal_rigidity": "Does the patient have nuchal rigidity? (mapped from neck stiffness questions)",
+    "urinary_symptoms": "Does the patient have urinary symptoms? - LLM inferred",
+    "abdominal_pain": "Does the patient have abdominal pain? (mapped from pain questions)",
     
-    # Drug Sensitivity
-    "penicillin_sensitive": "Is the organism sensitive to penicillin?",
-    "cephalosporin_sensitive": "Is the organism sensitive to cephalosporins?",
-    "aminoglycoside_sensitive": "Is the organism sensitive to aminoglycosides?",
-    "allergy_penicillin": "Is the patient allergic to penicillin?",
-    "allergy_sulfa": "Is the patient allergic to sulfa drugs?",
+    # Drug Sensitivity (require LLM inference)
+    "penicillin_sensitive": "Is the organism sensitive to penicillin? - LLM inferred",
+    "cephalosporin_sensitive": "Is the organism sensitive to cephalosporins? - LLM inferred",
+    "aminoglycoside_sensitive": "Is the organism sensitive to aminoglycosides? - LLM inferred",
+    "allergy_penicillin": "Is the patient allergic to penicillin? - LLM inferred",
+    "allergy_sulfa": "Is the patient allergic to sulfa drugs? - LLM inferred",
+    
+    # Additional parameters that can be inferred from available questions
+    "respiratory_condition": "Does the patient have a respiratory condition? (mapped from COPD/asthma questions)",
+    "sore_throat": "Does the patient have a sore throat? (mapped from 'Do you have a sore throat?')",
+    "nasal_symptoms": "Does the patient have nasal symptoms? (mapped from nasal congestion/discharge questions)",
+    "viral_infection": "Has the patient had a recent viral infection? (mapped from 'Have you recently had a viral infection?')",
+    "contact_exposure": "Has the patient been in contact with infected individuals? (mapped from contact questions)",
+    "travel_history": "Has the patient traveled recently? (mapped from 'Have you traveled out of the country in the last 4 weeks?')",
 }
 
 
