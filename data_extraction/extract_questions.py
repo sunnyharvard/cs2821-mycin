@@ -1,7 +1,7 @@
 import json
 
 INPUT_FILE = "data/release_evidences.json"
-OUTPUT_FILE = "outputs/question_en_output.txt"
+OUTPUT_FILE = "data_extraction/question_en_output.txt"
 
 def main():
     # Load the JSON
