@@ -73,13 +73,24 @@ def run_mycin_pipeline(
         # Initialize with known facts
         for param, value in mycin_data.items():
             if value is not None:
-                engine.set_fact(param, value, certainty=1.0)
+                engine.update_fact(param, value, certainty=1.0)
         
-        # Run forward chaining inference
-        applied_rules = engine.forward_chain(mycin_data)
+        # Run backward chaining inference for the goal "identity"
+        engine.backward_chain("identity", mycin_data)
+        
+        # Also try to infer infection site and treatment if not found
+        engine.backward_chain("infection_site", mycin_data)
+        engine.backward_chain("recommended_drug", mycin_data)
         
         # Get diagnosis
         diagnosis = engine.get_diagnosis()
+        
+        # Get applied rules (from diagnosis details)
+        applied_rules = [] # Backward chaining doesn't return a simple list, but we can extract from facts
+        for facts in engine.known_facts.values():
+            for fact in facts:
+                applied_rules.extend(fact.source_rules)
+        applied_rules = list(set(applied_rules)) # Deduplicate
         
         # Format output for evaluation
         organism_name = diagnosis["organism_identity"]["name"]
@@ -130,6 +141,13 @@ def example_llm_call(prompt: str) -> str:
     # For now, return a placeholder
     return "UNKNOWN"
 
+def gpt2_call(prompt: str) -> str:
+    from transformers import pipeline
+    
+    generator = pipeline('text-generation', model='gpt2')
+    response = generator(prompt, max_new_tokens=50, num_return_sequences=1)
+    return response[0]['generated_text']
+
 
 if __name__ == "__main__":
     # Example usage
@@ -144,7 +162,7 @@ if __name__ == "__main__":
     
     predictions = run_mycin_pipeline(
         [example_patient],
-        llm_call_fn=example_llm_call,
+        llm_call_fn=gpt2_call,
         use_llm_for_extraction=True,
         use_llm_for_questions=True
     )
