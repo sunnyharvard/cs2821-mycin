@@ -7,3 +7,4 @@ openai>=1.0.0   # or anthropic, cohere, etc. depending on what your partner uses
 
 # Optional but helpful utilities
 tqdm>=4.65      # progress bars (nice for large test sets)
+scipy>=1.10.0
