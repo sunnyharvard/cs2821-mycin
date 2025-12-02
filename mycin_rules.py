@@ -118,6 +118,41 @@ QUESTIONS = {
 
 
 # ============================================================================
+# ASK FIRST PARAMETERS
+# ============================================================================
+
+# Parameters that should be asked to the user/LLM first before trying to infer them via rules.
+# These are typically observable facts, lab results, or patient history.
+# Parameters NOT in this list (like 'identity', 'infection_site') will be inferred via rules first.
+ASK_FIRST_PARAMETERS = {
+    # Patient Demographics
+    "age", "sex", "weight",
+    
+    # Infection Site (Input)
+    "site", "culture_site",
+    
+    # Organism Characteristics (Lab)
+    "gram_stain", "morphology", "growth_pattern", "aerobicity", "spore_forming",
+    
+    # Clinical Context
+    "burn", "immunocompromised", "recent_surgery", "hospital_acquired", 
+    "community_acquired", "previous_antibiotics",
+    
+    # Lab Results
+    "white_blood_count", "fever", "cerebrospinal_fluid", "urine_culture",
+    "sputum_culture", "blood_culture",
+    
+    # Symptoms
+    "cough", "dyspnea", "chest_pain", "headache", "nuchal_rigidity",
+    "urinary_symptoms", "abdominal_pain",
+    
+    # Drug Sensitivity
+    "penicillin_sensitive", "cephalosporin_sensitive", "aminoglycoside_sensitive",
+    "allergy_penicillin", "allergy_sulfa",
+}
+
+
+# ============================================================================
 # ORGANISM IDENTIFICATION RULES
 # ============================================================================
 
