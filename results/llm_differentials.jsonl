@@ -1,0 +1,10 @@
+{"row_index": 0, "differential_probs": {"GERD": 0.6, "Boerhaave": 0.2, "Possible NSTEMI / STEMI": 0.1, "Pulmonary embolism": 0.1}}
+{"row_index": 1, "differential_probs": {"Acute COPD exacerbation / infection": 0.35, "Bronchitis": 0.25, "Viral pharyngitis": 0.15, "Acute rhinosinusitis": 0.15, "Bronchospasm / acute asthma exacerbation": 0.1}}
+{"row_index": 2, "differential_probs": {"Acute dystonic reactions": 0.7, "Larygospasm": 0.15, "Myasthenia gravis": 0.15}}
+{"row_index": 3, "differential_probs": {"Acute laryngitis": 0.3, "Viral pharyngitis": 0.25, "Bronchitis": 0.2, "Influenza": 0.15, "Pneumonia": 0.1}}
+{"row_index": 4, "differential_probs": {"Influenza": 0.35, "Viral pharyngitis": 0.25, "Pneumonia": 0.2, "Acute rhinosinusitis": 0.1, "Bronchitis": 0.1}}
+{"row_index": 5, "differential_probs": {"Acute rhinosinusitis": 0.25, "Influenza": 0.25, "Pneumonia": 0.2, "Bronchitis": 0.15, "Viral pharyngitis": 0.15}}
+{"row_index": 6, "differential_probs": {"Inguinal hernia": 0.4, "Bronchitis": 0.2, "Whooping cough": 0.2, "Localized edema": 0.2}}
+{"row_index": 7, "differential_probs": {"Spontaneous pneumothorax": 0.3, "Acute COPD exacerbation / infection": 0.25, "Pulmonary embolism": 0.15, "Possible NSTEMI / STEMI": 0.1, "Unstable angina": 0.1, "Pulmonary neoplasm": 0.1}}
+{"row_index": 8, "differential_probs": {"Acute COPD exacerbation / infection": 0.35, "Bronchitis": 0.2, "Pneumonia": 0.25, "Influenza": 0.1, "Viral pharyngitis": 0.1}}
+{"row_index": 9, "differential_probs": {"GERD": 0.35, "Boerhaave": 0.25, "Possible NSTEMI / STEMI": 0.2, "Unstable angina": 0.1, "Pneumonia": 0.1}}

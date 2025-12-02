@@ -315,6 +315,7 @@ def main():
                 demo["SEX"] = str(sex_val)
 
         patient_payloads.append({
+            "row_index": i,
             "demographics": demo,
             "evidence": human_dicts[i],
             # optionally include raw codes for downstream consumers:

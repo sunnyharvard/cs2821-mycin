@@ -24,7 +24,7 @@ def parse_dd_to_dict(dd_str):
     for item in parsed:
         if isinstance(item, (list, tuple)) and len(item) >= 2:
             disease = str(item[0])
-            prob = float(item[1]) * 100   # convert to percentage
+            prob = float(item[1])
             result[disease] = prob
 
     return result
