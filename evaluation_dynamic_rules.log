@@ -1,0 +1,36 @@
+Loaded 100 patient payloads
+
+Running MYCIN Medical Diagnosis on 100 patients...
+This may take a while due to LLM API calls...
+============================================================
+
+✅ Success! Generated predictions for 100 patients
+✅ Results saved to results/mycin_medical_differentials.jsonl
+
+Sample predictions (first 3):
+
+Patient 0:
+  GERD: 0.5000
+  Boerhaave: 0.1154
+  Pulmonary embolism: 0.0769
+
+Patient 1:
+  Acute COPD exacerbation / infection: 0.3077
+  Bronchospasm / acute asthma exacerbation: 0.2308
+  Bronchitis: 0.1538
+
+Patient 2:
+  Acute dystonic reactions: 0.6707
+  Larygospasm: 0.1754
+  Myasthenia gravis: 0.0769
+
+============================================================
+Running evaluation...
+============================================================
+=== Overall Evaluation ===
+Average KL Divergence: 12.0423
+Average Cross-Entropy: 13.9731
+Average Cosine Similarity: 0.5500
+Average L1 Distance: 1.2381
+
+Row-wise metrics saved to 'results/mycin_medical_evaluation.jsonl'

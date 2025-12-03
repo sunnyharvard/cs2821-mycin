@@ -13,13 +13,36 @@ import json
 from typing import Dict, List, Any, Optional, Callable, Tuple, Set
 from dataclasses import dataclass, field
 
-from mycin_rules import (
-    ALL_RULES,
-    Rule,
-    RuleCondition,
-    QUESTIONS,
-    ASK_FIRST_PARAMETERS,
-)
+# Import rules dynamically - will be patched by pipeline
+# Default to medical rules
+try:
+    from mycin_medical_rules import (
+        ALL_RULES,
+        Rule,
+        RuleCondition,
+        QUESTIONS,
+        ASK_FIRST_PARAMETERS,
+    )
+except ImportError:
+    # Fallback - create minimal stubs
+    ALL_RULES = []
+    QUESTIONS = {}
+    ASK_FIRST_PARAMETERS = set()
+    
+    @dataclass
+    class RuleCondition:
+        parameter: str
+        operator: str
+        value: Any
+    
+    @dataclass
+    class Rule:
+        rule_id: str
+        category: str
+        conditions: List[RuleCondition]
+        conclusion: Dict[str, Any]
+        certainty_factor: float
+        description: str
 
 
 @dataclass

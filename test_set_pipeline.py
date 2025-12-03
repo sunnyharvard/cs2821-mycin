@@ -188,17 +188,26 @@ def run_llm_pipeline(patient_payloads: List[Dict[str, Any]]) -> List[Dict[str, A
       }
     """
     try:
-        from mycin_pipeline_integration import run_mycin_pipeline, example_llm_call
+        from mycin_medical_pipeline import run_mycin_medical_pipeline, gpt4o_llm_call
     except ImportError:
-        raise NotImplementedError(
-            "MYCIN modules not found. Install dependencies or use --predictions JSONL."
-        )
+        try:
+            # Fallback to original MYCIN pipeline
+            from mycin_pipeline_integration import run_mycin_pipeline, example_llm_call
+            return run_mycin_pipeline(
+                patient_payloads,
+                llm_call_fn=example_llm_call,
+                use_llm_for_extraction=True,
+                use_llm_for_questions=True
+            )
+        except ImportError:
+            raise NotImplementedError(
+                "MYCIN modules not found. Install dependencies or use --predictions JSONL."
+            )
     
-    # Use MYCIN pipeline
-    # Replace example_llm_call with your actual LLM API call function
-    return run_mycin_pipeline(
+    # Use MYCIN medical diagnosis pipeline with GPT-4o
+    return run_mycin_medical_pipeline(
         patient_payloads,
-        llm_call_fn=example_llm_call,  # Replace with your LLM function
+        llm_call_fn=gpt4o_llm_call,
         use_llm_for_extraction=True,
         use_llm_for_questions=True
     )

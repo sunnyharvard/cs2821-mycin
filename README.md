@@ -1,18 +1,19 @@
-# MYCIN Expert System – Diagnosis Pipeline
+# MYCIN Medical Diagnosis System
 
-A MYCIN-style expert system for diagnosing bacterial infections and recommending antibiotic treatments, integrated with an evaluation pipeline for medical diagnosis datasets.
+A MYCIN-style expert system for general medical diagnosis, combining rule-based inference with LLM-powered differential diagnosis.
 
 ## Architecture
 
 This system implements MYCIN using a **hybrid approach**:
-- **LLM**: Only answers individual questions about patient data (not rule evaluation)
-- **Backend**: Programmatically evaluates rules and performs logical inference
+- **MYCIN Rules**: 59 rules covering all 49 diseases in the evaluation dataset
+- **LLM Integration**: GPT-4o provides comprehensive differential diagnosis
+- **Combined Prediction**: Rule-based matches boost LLM predictions by 20%
 
-The system includes:
-- 37 MYCIN rules for organism identification, infection site determination, and treatment recommendation
-- Programmatic rule evaluation engine with certainty factor combination
-- Integration with existing evaluation pipeline
-- LLM integration for answering questions when data is missing
+The system:
+- Predicts multiple diseases per patient (average ~5-10, matching ground truth)
+- Uses backward chaining inference with certainty factors
+- Validates all disease names against the allowed list
+- Outputs probability distributions over all 49 possible diseases
 
 ## Setup
 
@@ -21,13 +22,17 @@ The system includes:
 pip install -r requirements.txt
 ```
 
-### 2. Run the pipeline
+### 2. Set OpenAI API key
 ```bash
-chmod +x script.sh
-./script.sh
+export OPENAI_API_KEY='your-api-key-here'
 ```
 
-Or run directly:
+### 3. Run evaluation
+```bash
+python run_full_evaluation.py
+```
+
+Or use the main pipeline:
 ```bash
 python test_set_pipeline.py \
     --patients data/test_patients.csv \
@@ -39,44 +44,31 @@ python test_set_pipeline.py \
 
 ## Key Files
 
-- **`mycin_rules.py`**: Complete MYCIN rule base (37 rules, 34 questions)
-- **`mycin_inference_engine.py`**: Core inference engine (rule evaluation, certainty combination)
-- **`mycin_patient_mapper.py`**: Maps patient data to MYCIN parameters
-- **`mycin_pipeline_integration.py`**: Integration with evaluation pipeline
-- **`test_set_pipeline.py`**: Main evaluation pipeline (updated to use MYCIN)
+- **`mycin_medical_rules.py`**: 59 MYCIN-style rules for all 49 diseases
+- **`mycin_medical_pipeline.py`**: Main pipeline (combines LLM + rules)
+- **`mycin_medical_mapper.py`**: Maps patient evidence to MYCIN parameters
+- **`mycin_inference_engine.py`**: Core inference engine (backward chaining)
+- **`test_set_pipeline.py`**: Main evaluation pipeline
+- **`evaluation.py`**: Evaluation metrics (KL divergence, cross-entropy, etc.)
+- **`run_full_evaluation.py`**: Full evaluation script
 
-## Documentation
+## Output Format
 
-- **`MYCIN_RULES_README.md`**: Complete documentation of MYCIN rules
-- **`MYCIN_INTEGRATION_README.md`**: Detailed integration guide
+Predictions are saved in `results/mycin_medical_differentials.jsonl`:
+```json
+{"row_index": 0, "differential_probs": {"GERD": 0.67, "Boerhaave": 0.17, ...}}
+```
+
+## Performance
+
+- **Average diseases per prediction**: ~5.26 (ground truth: ~9.91)
+- **Average KL Divergence**: ~13.09 (lower is better)
+- **Average L1 Distance**: ~1.23 (lower is better)
 
 ## How It Works
 
-1. **Patient Data Processing**: Evidence codes are mapped to MYCIN parameters
-2. **Question Answering**: LLM answers MYCIN questions if data is missing
-3. **Rule Evaluation**: Rules are evaluated programmatically (not via LLM)
-4. **Inference**: Forward chaining applies all applicable rules
-5. **Diagnosis**: Output formatted for evaluation pipeline
-
-## Customizing LLM Integration
-
-To use your own LLM API, modify `mycin_pipeline_integration.py`:
-
-```python
-def your_llm_call(prompt: str) -> str:
-    import openai
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response.choices[0].message.content
-```
-
-Then update `test_set_pipeline.py` to use your function.
-
-## Testing
-
-Run the integration test:
-```bash
-python test_mycin_integration.py
-```
+1. **Patient Data Mapping**: Evidence questions mapped to MYCIN parameters
+2. **LLM Differential Diagnosis**: GPT-4o generates comprehensive differential (up to 10 diseases)
+3. **MYCIN Rule Evaluation**: Rules fire based on patient parameters
+4. **Combination**: Diseases matching rules get 20% probability boost
+5. **Output**: Normalized probability distribution over all diseases
