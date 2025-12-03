@@ -157,7 +157,7 @@ def build_patient_evidence_dicts(
 # Preview printing
 # --------------------------
 
-def print_preview_dicts(dicts: List[Dict[str, Any]], n: int = 10, title: str = "objects") -> None:
+def print_preview_dicts(dicts: List[Dict[str, Any]], n: int = 100, title: str = "objects") -> None:
     print(f"=== Preview of first {min(n, len(dicts))} {title} ===")
     for i, d in enumerate(dicts[:n]):
         print(f"Patient {i}:\n{json.dumps(d, indent=2, ensure_ascii=False)}")
@@ -323,7 +323,7 @@ def main():
         })
 
     # --- Preview before LLM ---
-    print_preview_dicts(patient_payloads, n=10, title="patient payloads (demographics + evidence)")
+    print_preview_dicts(patient_payloads, n=100, title="patient payloads (demographics + evidence)")
 
     # Save artifacts
     os.makedirs(args.out_dir, exist_ok=True)

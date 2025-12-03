@@ -11,7 +11,7 @@ CONDITIONS="data/release_conditions.json"        # path to your conditions file
 EVIDENCES="data/release_evidences.json"          # path to your evidences file
 OUTDIR="outputs"                           # directory for all generated files
 LABEL_COL="PATHOLOGY"                      # ground-truth column name in CSV
-LIMIT=10
+LIMIT=100
 
 # ---- RUN ----
 echo "Running test_set_pipeline.py on the test set..."

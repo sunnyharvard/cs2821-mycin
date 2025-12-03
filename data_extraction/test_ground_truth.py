@@ -35,7 +35,7 @@ def main():
 
     with open(OUTPUT_JSONL, "w", encoding="utf-8") as out:
         for i, row in df.iterrows():
-            if i == 10: 
+            if i == 100: 
                 break
             mapping = parse_dd_to_dict(row[DD_COL])
 
