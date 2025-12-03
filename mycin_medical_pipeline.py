@@ -22,7 +22,8 @@ def run_mycin_medical_pipeline(
     patient_payloads: List[Dict[str, Any]],
     llm_call_fn: Optional[Callable] = None,
     use_llm_for_extraction: bool = True,
-    use_llm_for_questions: bool = True
+    use_llm_for_questions: bool = True,
+    baseline=False
 ) -> List[Dict[str, Any]]:
     """
     Run MYCIN medical diagnosis inference on patient payloads.
@@ -49,6 +50,8 @@ def run_mycin_medical_pipeline(
     else:
         llm_qa_fn = None
     
+
+    print("STEP 1: Use LLM to extract additional parameters from evidence")
     for patient_payload in patient_payloads:
         row_index = patient_payload.get("row_index", len(predictions))
         
@@ -105,6 +108,8 @@ Return ONLY valid JSON: {{"fever": true/false, "cough": true/false, ...}}
             except Exception as e:
                 pass
         
+        print("STEP 2: Get comprehensive LLM differential diagnosis")
+
         # Step 2: Get comprehensive LLM differential diagnosis
         llm_probs = {}
         if llm_call_fn and all_diseases:
@@ -196,159 +201,163 @@ ALLOWED DISEASE LIST
             except Exception as e:
                 pass
         
-        # Step 3: Generate patient-specific rules using LLM
-        augmented_rules = ALL_RULES.copy()
-        if llm_call_fn:
-            try:
-                evidence = patient_payload.get("evidence", {})
-                demographics = patient_payload.get("demographics", {})
-                mycin_data = map_to_mycin_medical_format(enhanced_patient_data, None)
-                
-                # Identify key symptoms present
-                present_symptoms = [k for k, v in mycin_data.items() if v is True and k in QUESTIONS]
-                present_symptoms_str = ", ".join(present_symptoms[:10])  # Limit for prompt
-                
-                # Get list of all diseases
-                disease_list_str = "\n".join([f"- {d}" for d in all_diseases]) if all_diseases else ""
-                
-                # Generate patient-specific rules
-                rule_generation_prompt = f"""You are a medical expert creating MYCIN-style diagnostic rules for a specific patient.
-
-Patient Demographics:
-{json.dumps(demographics, indent=2)}
-
-Key Symptoms Present:
-{present_symptoms_str}
-
-Available Diseases:
-{disease_list_str}
-
-Generate 2-5 patient-specific diagnostic rules in JSON format. Each rule should:
-1. Use symptoms that are present in this patient
-2. Conclude a diagnosis from the available disease list
-3. Have appropriate certainty factors (0.2-0.8)
-
-Format (JSON array):
-[
-  {{
-    "rule_id": "DYNAMIC001",
-    "category": "Dynamic",
-    "conditions": [
-      {{"parameter": "fever", "operator": "is", "value": true}},
-      {{"parameter": "cough", "operator": "is", "value": true}}
-    ],
-    "conclusion": {{"diagnosis": "Influenza"}},
-    "certainty_factor": 0.7,
-    "description": "Patient-specific rule: fever + cough → Influenza"
-  }}
-]
-
-Return ONLY valid JSON array, no markdown, no explanation."""
-                
-                rule_response = llm_call_fn(rule_generation_prompt)
-                
-                # Parse and add dynamic rules
-                if isinstance(rule_response, str):
-                    rule_response = re.sub(r'```json\s*', '', rule_response)
-                    rule_response = re.sub(r'```\s*', '', rule_response)
-                    rule_response = rule_response.strip()
+        if not baseline:
+            # Step 3: Generate patient-specific rules using LLM
+            print("STEP 3: Generate patient-specific rules using LLM")
+            augmented_rules = ALL_RULES.copy()
+            if llm_call_fn:
+                try:
+                    evidence = patient_payload.get("evidence", {})
+                    demographics = patient_payload.get("demographics", {})
+                    mycin_data = map_to_mycin_medical_format(enhanced_patient_data, None)
                     
-                    json_match = re.search(r'\[[^\]]*\{[^}]*\}[^\]]*\]', rule_response, re.DOTALL)
-                    if json_match:
-                        rule_response = json_match.group(0)
+                    # Identify key symptoms present
+                    present_symptoms = [k for k, v in mycin_data.items() if v is True and k in QUESTIONS]
+                    present_symptoms_str = ", ".join(present_symptoms[:10])  # Limit for prompt
                     
-                    try:
-                        dynamic_rules_data = json.loads(rule_response)
-                        if isinstance(dynamic_rules_data, list):
-                            for rule_data in dynamic_rules_data:
-                                try:
-                                    # Validate and create Rule object
-                                    conditions = [
-                                        RuleCondition(
-                                            parameter=c["parameter"],
-                                            operator=c.get("operator", "is"),
-                                            value=c["value"]
-                                        )
-                                        for c in rule_data.get("conditions", [])
-                                    ]
-                                    
-                                    # Validate disease name
-                                    diagnosis = rule_data.get("conclusion", {}).get("diagnosis", "")
-                                    if diagnosis and all_diseases:
-                                        # Check if diagnosis is in allowed list
-                                        matched_disease = None
-                                        for allowed in all_diseases:
-                                            if diagnosis.lower() == allowed.lower():
-                                                matched_disease = allowed
-                                                break
-                                        
-                                        if matched_disease:
-                                            dynamic_rule = Rule(
-                                                rule_id=rule_data.get("rule_id", f"DYNAMIC{len(augmented_rules)}"),
-                                                category=rule_data.get("category", "Dynamic"),
-                                                conditions=conditions,
-                                                conclusion={"diagnosis": matched_disease},
-                                                certainty_factor=min(0.8, max(0.2, rule_data.get("certainty_factor", 0.5))),
-                                                description=rule_data.get("description", f"Dynamic rule for {matched_disease}")
-                                            )
-                                            augmented_rules.append(dynamic_rule)
-                                except Exception as e:
-                                    pass
-                    except json.JSONDecodeError:
-                        pass
-            except Exception as e:
-                pass
-        
-        # Step 4: Adapt rule certainty factors based on patient context
-        if llm_call_fn and len(augmented_rules) > len(ALL_RULES):
-            try:
-                # Use LLM to adjust certainty factors for dynamic rules based on patient context
-                evidence = patient_payload.get("evidence", {})
-                demographics = patient_payload.get("demographics", {})
-                
-                # Get dynamic rules
-                dynamic_rules = [r for r in augmented_rules if r.rule_id.startswith("DYNAMIC")]
-                
-                if dynamic_rules:
-                    rule_descriptions = "\n".join([
-                        f"- {r.rule_id}: {r.description} (CF: {r.certainty_factor})"
-                        for r in dynamic_rules[:5]  # Limit for prompt
-                    ])
+                    # Get list of all diseases
+                    disease_list_str = "\n".join([f"- {d}" for d in all_diseases]) if all_diseases else ""
                     
-                    adaptation_prompt = f"""You are a medical expert adjusting rule certainty factors based on patient context.
+                    # Generate patient-specific rules
+                    rule_generation_prompt = f"""You are a medical expert creating MYCIN-style diagnostic rules for a specific patient.
 
-Patient Demographics:
-{json.dumps(demographics, indent=2)}
+    Patient Demographics:
+    {json.dumps(demographics, indent=2)}
 
-Key Evidence:
-{json.dumps(dict(list(evidence.items())[:10]), indent=2)}
+    Key Symptoms Present:
+    {present_symptoms_str}
 
-Dynamic Rules Generated:
-{rule_descriptions}
+    Available Diseases:
+    {disease_list_str}
 
-Adjust certainty factors (0.2-0.8) for these rules based on how well they match this patient.
-Return JSON: {{"DYNAMIC001": 0.75, "DYNAMIC002": 0.65, ...}}
-Only include rules that should be adjusted."""
+    Generate 2-5 patient-specific diagnostic rules in JSON format. Each rule should:
+    1. Use symptoms that are present in this patient
+    2. Conclude a diagnosis from the available disease list
+    3. Have appropriate certainty factors (0.2-0.8)
+
+    Format (JSON array):
+    [
+    {{
+        "rule_id": "DYNAMIC001",
+        "category": "Dynamic",
+        "conditions": [
+        {{"parameter": "fever", "operator": "is", "value": true}},
+        {{"parameter": "cough", "operator": "is", "value": true}}
+        ],
+        "conclusion": {{"diagnosis": "Influenza"}},
+        "certainty_factor": 0.7,
+        "description": "Patient-specific rule: fever + cough → Influenza"
+    }}
+    ]
+
+    Return ONLY valid JSON array, no markdown, no explanation."""
                     
-                    adaptation_response = llm_call_fn(adaptation_prompt)
+                    rule_response = llm_call_fn(rule_generation_prompt)
                     
-                    # Parse and apply adjustments
-                    if isinstance(adaptation_response, str):
-                        adaptation_response = re.sub(r'```json\s*', '', adaptation_response)
-                        adaptation_response = re.sub(r'```\s*', '', adaptation_response)
-                        json_match = re.search(r'\{[^{}]*\}', adaptation_response, re.DOTALL)
+                    # Parse and add dynamic rules
+                    if isinstance(rule_response, str):
+                        rule_response = re.sub(r'```json\s*', '', rule_response)
+                        rule_response = re.sub(r'```\s*', '', rule_response)
+                        rule_response = rule_response.strip()
+                        
+                        json_match = re.search(r'\[[^\]]*\{[^}]*\}[^\]]*\]', rule_response, re.DOTALL)
                         if json_match:
-                            try:
-                                adjustments = json.loads(json_match.group(0))
-                                for rule in dynamic_rules:
-                                    if rule.rule_id in adjustments:
-                                        new_cf = adjustments[rule.rule_id]
-                                        rule.certainty_factor = min(0.8, max(0.2, float(new_cf)))
-                            except:
-                                pass
-            except Exception as e:
-                pass
+                            rule_response = json_match.group(0)
+                        
+                        try:
+                            dynamic_rules_data = json.loads(rule_response)
+                            if isinstance(dynamic_rules_data, list):
+                                for rule_data in dynamic_rules_data:
+                                    try:
+                                        # Validate and create Rule object
+                                        conditions = [
+                                            RuleCondition(
+                                                parameter=c["parameter"],
+                                                operator=c.get("operator", "is"),
+                                                value=c["value"]
+                                            )
+                                            for c in rule_data.get("conditions", [])
+                                        ]
+                                        
+                                        # Validate disease name
+                                        diagnosis = rule_data.get("conclusion", {}).get("diagnosis", "")
+                                        if diagnosis and all_diseases:
+                                            # Check if diagnosis is in allowed list
+                                            matched_disease = None
+                                            for allowed in all_diseases:
+                                                if diagnosis.lower() == allowed.lower():
+                                                    matched_disease = allowed
+                                                    break
+                                            
+                                            if matched_disease:
+                                                dynamic_rule = Rule(
+                                                    rule_id=rule_data.get("rule_id", f"DYNAMIC{len(augmented_rules)}"),
+                                                    category=rule_data.get("category", "Dynamic"),
+                                                    conditions=conditions,
+                                                    conclusion={"diagnosis": matched_disease},
+                                                    certainty_factor=min(0.8, max(0.2, rule_data.get("certainty_factor", 0.5))),
+                                                    description=rule_data.get("description", f"Dynamic rule for {matched_disease}")
+                                                )
+                                                augmented_rules.append(dynamic_rule)
+                                    except Exception as e:
+                                        pass
+                        except json.JSONDecodeError:
+                            pass
+                except Exception as e:
+                    pass
+            
+            # Step 4: Adapt rule certainty factors based on patient context
+            print("STEP 4: Adapt rule certainty factors based on patient context")
+            if llm_call_fn and len(augmented_rules) > len(ALL_RULES):
+                try:
+                    # Use LLM to adjust certainty factors for dynamic rules based on patient context
+                    evidence = patient_payload.get("evidence", {})
+                    demographics = patient_payload.get("demographics", {})
+                    
+                    # Get dynamic rules
+                    dynamic_rules = [r for r in augmented_rules if r.rule_id.startswith("DYNAMIC")]
+                    
+                    if dynamic_rules:
+                        rule_descriptions = "\n".join([
+                            f"- {r.rule_id}: {r.description} (CF: {r.certainty_factor})"
+                            for r in dynamic_rules[:5]  # Limit for prompt
+                        ])
+                        
+                        adaptation_prompt = f"""You are a medical expert adjusting rule certainty factors based on patient context.
+
+    Patient Demographics:
+    {json.dumps(demographics, indent=2)}
+
+    Key Evidence:
+    {json.dumps(dict(list(evidence.items())[:10]), indent=2)}
+
+    Dynamic Rules Generated:
+    {rule_descriptions}
+
+    Adjust certainty factors (0.2-0.8) for these rules based on how well they match this patient.
+    Return JSON: {{"DYNAMIC001": 0.75, "DYNAMIC002": 0.65, ...}}
+    Only include rules that should be adjusted."""
+                        
+                        adaptation_response = llm_call_fn(adaptation_prompt)
+                        
+                        # Parse and apply adjustments
+                        if isinstance(adaptation_response, str):
+                            adaptation_response = re.sub(r'```json\s*', '', adaptation_response)
+                            adaptation_response = re.sub(r'```\s*', '', adaptation_response)
+                            json_match = re.search(r'\{[^{}]*\}', adaptation_response, re.DOTALL)
+                            if json_match:
+                                try:
+                                    adjustments = json.loads(json_match.group(0))
+                                    for rule in dynamic_rules:
+                                        if rule.rule_id in adjustments:
+                                            new_cf = adjustments[rule.rule_id]
+                                            rule.certainty_factor = min(0.8, max(0.2, float(new_cf)))
+                                except:
+                                    pass
+                except Exception as e:
+                    pass
         
+        print("STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions")
         # Step 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
         rule_probs = {}
         try:
@@ -408,6 +417,7 @@ Only include rules that should be adjusted."""
             pass
         
         # Step 6: Intelligently combine rule-based and LLM predictions
+        print("STEP 6: Intelligently combine rule-based and LLM predictions")
         probs = {}
         
         if llm_probs and rule_probs:
@@ -461,11 +471,11 @@ def gpt4o_llm_call(prompt: str) -> str:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OPENAI_API_KEY environment variable not set. Please set it with: export OPENAI_API_KEY='your-key-here'")
-    
+
     client = OpenAI(api_key=api_key)
     
     try:
-        response = client.chat.completions.create(
+        '''response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
@@ -477,7 +487,14 @@ def gpt4o_llm_call(prompt: str) -> str:
             temperature=0.2,
             max_tokens=500,
         )
-        return response.choices[0].message.content.strip()
+        return response.choices[0].message.content.strip()'''
+        response = client.completions.create(
+            model="gpt-3.5-turbo-instruct", # gpt-4o-mini
+            prompt="You are a medical expert assistant. Answer questions concisely and accurately based on the provided patient information. When asked for differential diagnosis, return ONLY valid JSON with no additional text." + "\n\n" + prompt,
+            temperature=0.2,
+            max_tokens=500,
+        )
+        return response.choices[0].text.strip()
     except Exception as e:
         print(f"Error calling OpenAI API: {e}")
         return "UNKNOWN"
