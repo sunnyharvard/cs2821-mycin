@@ -1,0 +1,610 @@
+Loaded 100 patient payloads
+
+Running MYCIN Medical Diagnosis on 100 patients...
+This may take a while due to LLM API calls...
+============================================================
+STEP 1: Use LLM to extract additional parameters from evidence
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+
+================================================================================
+MYCIN EXPLANATION PROMPT (Sample)
+================================================================================
+You are a senior clinician performing differential diagnosis.
+
+You are given:
+- A patient's demographics.
+- A list of symptoms and clinical evidence.
+- Differential diagnosis probabilities.
+- Key clinical patterns that support diagnoses (from systematic analysis).
+
+--------------------
+PATIENT DATA
+--------------------
+Row index: 0
+
+Demographics:
+{
+  "AGE": 49,
+  "SEX": "F"
+}
+
+Evidence:
+- Do you have pain somewhere, related to your reason for consulting?: True
+- Characterize your pain:: burning
+- Do you feel pain somewhere?: hypochondrium(R)
+- How intense is the pain?: 6
+- Does the pain radiate to another location?: upper chest
+- How precisely is the pain located?: 3
+- How fast did the pain appear?: 2
+- Are you significantly overweight compared to people of the same height as you?: True
+- Do you drink alcohol excessively or do you have an addiction to alcohol?: True
+- Do you have a hiatal hernia?: True
+- Have you recently had stools that were black (like coal)?: True
+- Do you think you are pregnant or are you currently pregnant?: True
+- Do you have a burning sensation that starts in your stomach then goes up into your throat, and can be associated with a bitter taste in your mouth?: True
+- Do you have a cough?: True
+- Have you traveled out of the country in the last 4 weeks?: N
+
+--------------------
+DIFFERENTIAL DIAGNOSIS PROBABILITIES
+--------------------
+  - GERD: 50.00%
+  - Boerhaave: 15.38%
+  - Pulmonary embolism: 11.54%
+  - Possible NSTEMI / STEMI: 7.69%
+  - Unstable angina: 7.69%
+
+Key Clinical Patterns Supporting Diagnoses:
+  - GERD: heartburn + burning sensation + worse when lying down (key findings: heartburn, burning sensation, worse lying down)
+  - GERD: burning sensation + hiatal hernia + worse when lying down (key findings: burning sensation, hiatal hernia, worse lying down)
+
+
+
+Note: Systematic analysis highlighted the following:
+  - GERD: Systematic analysis increased confidence due to specific symptom patterns
+
+Your task: Provide a clear, concise explanation of your diagnostic reasoning.
+
+The explanation should:
+1. Summarize the key symptoms and clinical presentation
+2. Explain which symptoms support each diagnosis and why these probabilities were assigned
+3. Address the most important differential diagnoses and why they are more or less likely
+4. Use natural clinical language - write as if explaining to a colleague
+
+
+IMPORTANT: The 'Key Clinical Patterns' section above identifies specific symptom combinations that support diagnoses. Naturally incorporate these patterns into your explanation using clinical reasoning (e.g., 'The combination of fever, productive cough, and smoking history strongly suggests bronchitis, as these are classic indicators').
+
+Write a clear explanation (3-5 sentences) that focuses on the patient's symptoms and clinical reasoning. Do not mention diagnostic systems or technical processes.
+================================================================================
+
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+STEP 2: Get comprehensive LLM differential diagnosis
+STEP 3: Generate patient-specific rules using LLM
+STEP 4: Adapt rule certainty factors based on patient context
+STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
+STEP 6: Intelligently combine rule-based and LLM predictions
+Saved explanations to results/mycin_medical_explanations.csv
+
+✅ Success! Generated predictions for 100 patients
+✅ Results saved to results/mycin_medical_differentials.jsonl
+
+Sample predictions (first 3):
+
+Patient 0:
+  GERD: 0.5000
+  Boerhaave: 0.1538
+  Pulmonary embolism: 0.1154
+
+Patient 1:
+  Acute COPD exacerbation / infection: 0.3462
+  Bronchospasm / acute asthma exacerbation: 0.1923
+  Bronchitis: 0.1538
+
+Patient 2:
+  Acute dystonic reactions: 0.5938
+  Larygospasm: 0.2139
+  Myasthenia gravis: 0.0769
+
+============================================================
+Running evaluation...
+============================================================
+=== Overall Evaluation ===
+Average KL Divergence: 12.0863
+Average Cross-Entropy: 14.0171
+Average Cosine Similarity: 0.5567
+Average L1 Distance: 1.2361
+
+Row-wise metrics saved to 'results/mycin_medical_evaluation.jsonl'

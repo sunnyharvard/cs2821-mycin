@@ -5,7 +5,9 @@ Run full evaluation of MYCIN Medical Diagnosis System
 
 import json
 import os
-from mycin_medical_pipeline import run_mycin_medical_pipeline, gpt4o_llm_call
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from src.mycin_medical_pipeline import run_mycin_medical_pipeline, gpt4o_llm_call
 
 def main():
     # Check API key

@@ -1,0 +1,56 @@
+You are a senior clinician performing differential diagnosis.
+
+You are given:
+- A patient's demographics.
+- A list of symptoms and clinical evidence.
+- Differential diagnosis probabilities.
+- MYCIN rule-based reasoning showing symptom patterns that support diagnoses.
+
+--------------------
+PATIENT DATA
+--------------------
+Row index: 0
+
+Demographics:
+{
+  "AGE": 49,
+  "SEX": "F"
+}
+
+Evidence:
+- Burning pain in the right hypochondrium radiating to the upper chest: Yes
+- Burning sensation starting in the stomach and moving to the throat: Yes
+- Symptoms worsen when lying down: Yes
+- History of excessive alcohol use: Yes
+- Hiatal hernia: Yes
+- Black stools: Yes
+- Epigastric pain: Yes
+- Smoking history: Yes
+
+--------------------
+DIFFERENTIAL DIAGNOSIS PROBABILITIES
+--------------------
+  - GERD: 53.85%
+  - Boerhaave: 11.54%
+  - Pancreatic neoplasm: 7.69%
+  - Possible NSTEMI / STEMI: 7.69%
+  - Unstable angina: 7.69%
+
+MYCIN Rule-Based Reasoning (symptom patterns that support diagnoses):
+GERD:
+  - Classic GERD symptoms: burning pain, acid reflux, hiatal hernia (conditions: heartburn=true, hiatal_hernia=true, alcohol_use=true)
+  - GERD with risk factors: alcohol use and hiatal hernia increase GERD probability (conditions: heartburn=true, alcohol_use=true, hiatal_hernia=true)
+
+Your task: Provide a clear, concise explanation of your diagnostic reasoning.
+
+The explanation should:
+1. Summarize the key symptoms and clinical presentation
+2. Explain which symptoms support each diagnosis and why these probabilities were assigned
+3. Address the most important differential diagnoses and why they are more or less likely
+4. Use natural clinical language - write as if explaining to a colleague
+
+IMPORTANT: The MYCIN reasoning section above shows specific symptom patterns that support diagnoses. Naturally incorporate these patterns into your explanation (e.g., 'The combination of fever, productive cough, and smoking history strongly suggests bronchitis, as these are classic indicators').
+
+Write a clear explanation (3-5 sentences) that focuses on the patient's symptoms and clinical reasoning. Do not mention diagnostic systems or technical processes.
+
+

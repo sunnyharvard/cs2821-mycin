@@ -29,12 +29,12 @@ export OPENAI_API_KEY='your-api-key-here'
 
 ### 3. Run evaluation
 ```bash
-python run_full_evaluation.py
+python evaluation/run_full_evaluation.py
 ```
 
 Or use the main pipeline:
 ```bash
-python test_set_pipeline.py \
+python tests/test_set_pipeline.py \
     --patients data/test_patients.csv \
     --evidences data/evidences.json \
     --conditions data/conditions.json \
@@ -42,21 +42,75 @@ python test_set_pipeline.py \
     --out-dir outputs
 ```
 
+## Directory Structure
+
+```
+.
+├── src/                     # Core MYCIN system modules
+│   ├── mycin_medical_rules.py          # MYCIN-style rules for all diseases
+│   ├── mycin_medical_pipeline.py       # Main pipeline (combines LLM + rules)
+│   ├── mycin_medical_mapper.py         # Maps patient evidence to MYCIN parameters
+│   ├── mycin_inference_engine.py       # Core inference engine (backward chaining)
+│   └── oneshot_llm.py                  # LLM-only baseline for comparison
+├── evaluation/              # Evaluation scripts and metrics
+│   ├── evaluation.py                   # Evaluation metrics (KL divergence, cross-entropy, etc.)
+│   ├── run_full_evaluation.py          # Full evaluation script
+│   ├── evaluate_explanations.py        # Clinical quality evaluation (LLM judge)
+│   └── evaluate_patient_satisfaction.py # Patient satisfaction evaluation (LLM judge)
+├── tests/                   # Test and debug scripts
+│   ├── test_set_pipeline.py            # Main evaluation pipeline
+│   └── test_sample_prompt.py           # Sample prompt testing
+├── scripts/                 # Utility scripts
+│   └── script.sh                       # Pipeline runner script
+├── logs/                    # Execution logs
+├── results/                 # Prediction and evaluation results
+├── outputs/                 # Intermediate patient data
+├── data_extraction/         # Ground truth and data extraction
+└── engine/                  # Original MYCIN LISP code
+```
+
 ## Key Files
 
-- **`mycin_medical_rules.py`**: 59 MYCIN-style rules for all 49 diseases
+### Core System (src/)
+- **`mycin_medical_rules.py`**: MYCIN-style rules for all diseases
 - **`mycin_medical_pipeline.py`**: Main pipeline (combines LLM + rules)
 - **`mycin_medical_mapper.py`**: Maps patient evidence to MYCIN parameters
 - **`mycin_inference_engine.py`**: Core inference engine (backward chaining)
-- **`test_set_pipeline.py`**: Main evaluation pipeline
+- **`oneshot_llm.py`**: LLM-only baseline for comparison
+
+### Evaluation (evaluation/)
 - **`evaluation.py`**: Evaluation metrics (KL divergence, cross-entropy, etc.)
 - **`run_full_evaluation.py`**: Full evaluation script
+- **`evaluate_explanations.py`**: Evaluate explanation quality from clinical perspective
+- **`evaluate_patient_satisfaction.py`**: Evaluate explanations from patient's perspective
+
+### Tests (tests/)
+- **`test_set_pipeline.py`**: Main evaluation pipeline
 
 ## Output Format
 
+### Predictions
 Predictions are saved in `results/mycin_medical_differentials.jsonl`:
 ```json
 {"row_index": 0, "differential_probs": {"GERD": 0.67, "Boerhaave": 0.17, ...}}
+```
+
+### Explanations
+Explanations are saved in CSV format:
+- `results/llm_differentials_explanations.csv`: One-shot LLM explanations
+- `results/mycin_medical_explanations.csv`: MYCIN explanations with reasoning
+
+### Evaluation Results
+- `results/explanation_evaluations.csv`: Clinical quality scores (0-100)
+- `results/patient_satisfaction_evaluations.csv`: Patient satisfaction scores (0-100)
+
+### Running Evaluations
+```bash
+# Evaluate explanation quality (clinical perspective)
+python evaluation/evaluate_explanations.py
+
+# Evaluate patient satisfaction
+python evaluation/evaluate_patient_satisfaction.py
 ```
 
 ## Performance
