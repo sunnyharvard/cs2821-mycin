@@ -17,12 +17,12 @@ from dataclasses import dataclass, field
 # Default to medical rules
 try:
     from mycin_medical_rules import (
-        ALL_RULES,
-        Rule,
-        RuleCondition,
-        QUESTIONS,
-        ASK_FIRST_PARAMETERS,
-    )
+    ALL_RULES,
+    Rule,
+    RuleCondition,
+    QUESTIONS,
+    ASK_FIRST_PARAMETERS,
+)
 except ImportError:
     # Fallback - create minimal stubs
     ALL_RULES = []

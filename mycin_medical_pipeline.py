@@ -12,6 +12,7 @@ from typing import Dict, List, Any, Optional, Callable
 import json
 import os
 import re
+import csv
 
 from mycin_inference_engine import MYCINInferenceEngine, simple_llm_qa_function
 from mycin_medical_mapper import map_to_mycin_medical_format
@@ -23,7 +24,9 @@ def run_mycin_medical_pipeline(
     llm_call_fn: Optional[Callable] = None,
     use_llm_for_extraction: bool = True,
     use_llm_for_questions: bool = True,
-    baseline=False
+    baseline=False,
+    save_csv: bool = True,
+    csv_output_path: str = "results/mycin_medical_explanations.csv"
 ) -> List[Dict[str, Any]]:
     """
     Run MYCIN medical diagnosis inference on patient payloads.
@@ -32,6 +35,10 @@ def run_mycin_medical_pipeline(
     - Rules evaluate programmatically to determine diagnoses
     - LLM extracts parameters, answers questions, and provides comprehensive differential
     - Intelligent combination: rules boost confidence, LLM fills gaps
+    
+    Args:
+        save_csv: If True, save explanations to CSV file
+        csv_output_path: Path to save CSV file with explanations
     """
     predictions = []
     
@@ -201,10 +208,12 @@ ALLOWED DISEASE LIST
             except Exception as e:
                 pass
         
+        # Initialize augmented_rules (will be used in Step 5)
+        augmented_rules = ALL_RULES.copy()
+        
         if not baseline:
             # Step 3: Generate patient-specific rules using LLM
             print("STEP 3: Generate patient-specific rules using LLM")
-            augmented_rules = ALL_RULES.copy()
             if llm_call_fn:
                 try:
                     evidence = patient_payload.get("evidence", {})
@@ -360,6 +369,7 @@ ALLOWED DISEASE LIST
         print("STEP 5: Run MYCIN rules (static + dynamic) to get rule-based predictions")
         # Step 5: Run MYCIN rules (static + dynamic) to get rule-based predictions
         rule_probs = {}
+        mycin_reasoning = {}  # Will store rule information for explanations
         try:
             # Map patient data to MYCIN format (use enhanced data if available)
             mycin_data = map_to_mycin_medical_format(enhanced_patient_data, llm_call_fn if use_llm_for_extraction else None)
@@ -396,6 +406,9 @@ ALLOWED DISEASE LIST
             # Get all diagnosis facts from rule evaluation
             diagnosis_facts = engine.get_facts("diagnosis")
             
+            # Capture MYCIN reasoning: which rules fired for each diagnosis
+            mycin_reasoning = {}  # disease -> list of rule info
+            
             if diagnosis_facts:
                 # Convert certainty factors to probabilities
                 # Normalize positive certainties
@@ -405,6 +418,37 @@ ALLOWED DISEASE LIST
                     if total_cf > 0:
                         for fact in positive_facts:
                             rule_probs[fact.value] = fact.certainty / total_cf
+                            
+                            # Capture which rules contributed to this diagnosis
+                            disease = fact.value
+                            if disease not in mycin_reasoning:
+                                mycin_reasoning[disease] = []
+                            
+                            # Get rule information for each source rule
+                            for rule_id in fact.source_rules:
+                                # Find the rule in augmented_rules
+                                for rule in augmented_rules:
+                                    if rule.rule_id == rule_id:
+                                        # Extract key conditions that were met
+                                        conditions_met = []
+                                        for cond in rule.conditions:
+                                            param_value = mycin_data.get(cond.parameter)
+                                            if param_value is not None:
+                                                if cond.operator == "is" and param_value == cond.value:
+                                                    conditions_met.append(f"{cond.parameter}={cond.value}")
+                                                elif cond.operator == "greater_than" and param_value > cond.value:
+                                                    conditions_met.append(f"{cond.parameter}>{cond.value}")
+                                                elif cond.operator == "less_than" and param_value < cond.value:
+                                                    conditions_met.append(f"{cond.parameter}<{cond.value}")
+                                        
+                                        mycin_reasoning[disease].append({
+                                            "rule_id": rule_id,
+                                            "description": rule.description,
+                                            "certainty_factor": rule.certainty_factor,
+                                            "conditions_met": conditions_met,
+                                            "contributed_certainty": fact.certainty
+                                        })
+                                        break
                     else:
                         # If all certainties are 0, use uniform distribution
                         for fact in positive_facts:
@@ -414,6 +458,7 @@ ALLOWED DISEASE LIST
             mycin_inference_engine.ALL_RULES = _orig_rules_ie
             mycin_rules.ALL_RULES = _orig_rules_module
         except Exception as e:
+            mycin_reasoning = {}
             pass
         
         # Step 6: Intelligently combine rule-based and LLM predictions
@@ -454,11 +499,194 @@ ALLOWED DISEASE LIST
             if total > 0:
                 probs = {k: v / total for k, v in probs.items()}
         
+        # Step 7: Generate explanation combining one-shot LLM and MYCIN adjustments
+        explanation = ""
+        if llm_call_fn:
+            try:
+                evidence = patient_payload.get("evidence", {})
+                demographics = patient_payload.get("demographics", {})
+                
+                # Format key symptoms for natural presentation
+                key_symptoms = []
+                for k, v in list(evidence.items())[:12]:
+                    if v and str(v).lower() not in ["none", "unknown", "false", "no"]:
+                        key_symptoms.append(f"{k}: {v}")
+                
+                # Format top diagnoses with probabilities
+                top_diagnoses = sorted(probs.items(), key=lambda x: x[1], reverse=True)[:5] if probs else []
+                diagnoses_str = "\n".join([f"  - {disease}: {prob:.2%}" for disease, prob in top_diagnoses])
+                
+                # Format MYCIN reasoning for top diagnoses in natural clinical language
+                mycin_reasoning_str = ""
+                if mycin_reasoning:
+                    reasoning_lines = []
+                    for disease, prob in top_diagnoses[:3]:  # Top 3 diagnoses
+                        if disease in mycin_reasoning and mycin_reasoning[disease]:
+                            rules_info = mycin_reasoning[disease]
+                            # Collect key symptoms/patterns from rules in natural language
+                            symptom_patterns = []
+                            for rule_info in rules_info[:2]:  # Top 2 rules per disease
+                                # Convert technical conditions to natural symptom descriptions
+                                natural_symptoms = []
+                                for cond_str in rule_info["conditions_met"][:4]:  # Top 4 conditions
+                                    # Convert "parameter=value" to natural language
+                                    if "=" in cond_str:
+                                        param, val = cond_str.split("=", 1)
+                                        # Map common parameters to natural descriptions
+                                        param_map = {
+                                            "fever": "fever",
+                                            "cough": "cough",
+                                            "productive_cough": "productive cough",
+                                            "dyspnea": "shortness of breath",
+                                            "wheezing": "wheezing",
+                                            "sore_throat": "sore throat",
+                                            "chest_pain": "chest pain",
+                                            "heartburn": "heartburn",
+                                            "smoking": "smoking history",
+                                            "copd": "COPD history",
+                                            "asthma": "asthma history",
+                                            "hiatal_hernia": "hiatal hernia",
+                                            "alcohol_use": "alcohol use",
+                                            "contact_exposure": "recent contact with similar symptoms"
+                                        }
+                                        natural_param = param_map.get(param, param.replace("_", " "))
+                                        if val.lower() == "true" or val == "1":
+                                            natural_symptoms.append(natural_param)
+                                        elif val.lower() not in ["false", "0", "none"]:
+                                            natural_symptoms.append(f"{natural_param}: {val}")
+                                
+                                if natural_symptoms:
+                                    pattern = ", ".join(natural_symptoms)
+                                    # Use rule description if it's clinical, otherwise create natural description
+                                    if rule_info['description'] and not any(tech_word in rule_info['description'].lower() for tech_word in ["rule", "condition", "parameter"]):
+                                        # Remove disease name from description if it starts with it
+                                        desc = rule_info['description']
+                                        if desc.startswith(disease + ":"):
+                                            desc = desc[len(disease)+1:].strip()
+                                        reasoning_lines.append(f"  - {disease}: {desc} (key findings: {pattern})")
+                                    else:
+                                        reasoning_lines.append(f"  - {disease}: The presence of {pattern} supports this diagnosis")
+                    
+                    if reasoning_lines:
+                        mycin_reasoning_str = "\n\nKey Clinical Patterns Supporting Diagnoses:\n" + "\n".join(reasoning_lines)
+                
+                # Format comparison in natural clinical language (optional context)
+                comparison_str = ""
+                if llm_probs and rule_probs:
+                    comparison_lines = []
+                    for disease, prob in top_diagnoses[:3]:
+                        llm_prob = llm_probs.get(disease, 0)
+                        rule_prob = rule_probs.get(disease, 0)
+                        if rule_prob > llm_prob + 0.05:  # Only show significant differences
+                            comparison_lines.append(f"  - {disease}: Systematic analysis increased confidence due to specific symptom patterns")
+                        elif disease not in llm_probs and rule_prob > 0.1:
+                            comparison_lines.append(f"  - {disease}: Identified through systematic pattern analysis ({prob:.1%} probability)")
+                    
+                    if comparison_lines:
+                        comparison_str = "\n\nNote: Systematic analysis highlighted the following:\n" + "\n".join(comparison_lines)
+                
+                # Format evidence similar to one-shot LLM
+                ev_lines = []
+                for k, v in list(evidence.items())[:15]:
+                    if v and str(v).lower() not in ["none", "unknown", "false", "no"]:
+                        ev_lines.append(f"- {k}: {v}")
+                
+                # Build explanation prompt similar to one-shot LLM, with MYCIN reasoning added
+                mycin_note = "- Key clinical patterns that support diagnoses (from systematic analysis)." if mycin_reasoning_str else ""
+                mycin_instruction = "\n\nIMPORTANT: The 'Key Clinical Patterns' section above identifies specific symptom combinations that support diagnoses. Naturally incorporate these patterns into your explanation using clinical reasoning (e.g., 'The combination of fever, productive cough, and smoking history strongly suggests bronchitis, as these are classic indicators')." if mycin_reasoning_str else ""
+                
+                explanation_prompt = f"""You are a senior clinician performing differential diagnosis.
+
+You are given:
+- A patient's demographics.
+- A list of symptoms and clinical evidence.
+- Differential diagnosis probabilities.
+{mycin_note}
+
+--------------------
+PATIENT DATA
+--------------------
+Row index: {row_index}
+
+Demographics:
+{json.dumps(demographics, indent=2)}
+
+Evidence:
+{chr(10).join(ev_lines)}
+
+--------------------
+DIFFERENTIAL DIAGNOSIS PROBABILITIES
+--------------------
+{diagnoses_str}{mycin_reasoning_str}
+
+{comparison_str if comparison_str else ""}
+
+Your task: Provide a clear, concise explanation of your diagnostic reasoning.
+
+The explanation should:
+1. Summarize the key symptoms and clinical presentation
+2. Explain which symptoms support each diagnosis and why these probabilities were assigned
+3. Address the most important differential diagnoses and why they are more or less likely
+4. Use natural clinical language - write as if explaining to a colleague
+{mycin_instruction}
+
+Write a clear explanation (3-5 sentences) that focuses on the patient's symptoms and clinical reasoning. Do not mention diagnostic systems or technical processes."""
+                
+                # Debug: print prompt for first patient
+                if row_index == 0:
+                    print("\n" + "=" * 80)
+                    print("MYCIN EXPLANATION PROMPT (Sample)")
+                    print("=" * 80)
+                    print(explanation_prompt)
+                    print("=" * 80 + "\n")
+                
+                explanation = llm_call_fn(explanation_prompt)
+                # Clean up explanation (remove markdown, extra formatting)
+                explanation = re.sub(r'```[^\n]*\n', '', explanation)
+                explanation = re.sub(r'^Explanation:?\s*', '', explanation, flags=re.IGNORECASE)
+                explanation = explanation.strip()
+            except Exception as e:
+                explanation = f"Explanation generation failed: {str(e)}"
+        
         # Format output
         predictions.append({
             "row_index": row_index,
-            "differential_probs": probs
+            "differential_probs": probs,
+            "explanation": explanation,
+            "llm_baseline_probs": llm_probs,
+            "mycin_rule_probs": rule_probs,
+            "mycin_reasoning": mycin_reasoning
         })
+    
+    # Save to CSV if requested
+    if save_csv:
+        try:
+            os.makedirs(os.path.dirname(csv_output_path), exist_ok=True)
+            with open(csv_output_path, "w", newline="", encoding="utf-8") as csv_f:
+                fieldnames = ["row_index", "diagnosis", "probabilities", "explanation"]
+                writer = csv.DictWriter(csv_f, fieldnames=fieldnames)
+                writer.writeheader()
+                
+                for pred in predictions:
+                    row_index = pred.get("row_index", 0)
+                    probs = pred.get("differential_probs", {})
+                    explanation = pred.get("explanation", "No explanation provided.")
+                    
+                    # Get top diagnosis
+                    top_diagnosis = None
+                    if probs:
+                        top_diagnosis = max(probs.items(), key=lambda x: x[1])[0]
+                    
+                    writer.writerow({
+                        "row_index": row_index,
+                        "diagnosis": top_diagnosis or "",
+                        "probabilities": json.dumps(probs),
+                        "explanation": explanation
+                    })
+            
+            print(f"Saved explanations to {csv_output_path}")
+        except Exception as e:
+            print(f"Warning: Failed to save CSV: {e}")
     
     return predictions
 
@@ -475,26 +703,19 @@ def gpt4o_llm_call(prompt: str) -> str:
     client = OpenAI(api_key=api_key)
     
     try:
-        '''response = client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a medical expert assistant. Answer questions concisely and accurately based on the provided patient information. When asked for differential diagnosis, return ONLY valid JSON with no additional text."
+                    "content": "You are a medical expert assistant. Answer questions concisely and accurately based on the provided patient information. When asked for differential diagnosis, return ONLY valid JSON with no additional text. When asked for explanations, write natural clinical language."
                 },
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2,
-            max_tokens=500,
+            max_tokens=800,  # Increased for better explanations
         )
-        return response.choices[0].message.content.strip()'''
-        response = client.completions.create(
-            model="gpt-3.5-turbo-instruct", # gpt-4o-mini
-            prompt="You are a medical expert assistant. Answer questions concisely and accurately based on the provided patient information. When asked for differential diagnosis, return ONLY valid JSON with no additional text." + "\n\n" + prompt,
-            temperature=0.2,
-            max_tokens=500,
-        )
-        return response.choices[0].text.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Error calling OpenAI API: {e}")
         return "UNKNOWN"
